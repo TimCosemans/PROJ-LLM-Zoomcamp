@@ -1,0 +1,25 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.0
+    container_name: elasticsearch
+    restart: unless-stopped
+    networks:
+      - project
+    ports:
+      - 9200:9200 
+    mem_limit: 6g
+    environment:
+      - DATAPATH=/shared/data
+      - MLFLOW_TRACKING_URI=/shared/mlruns
+    volumes:
+      - shared:/shared
+
+volumes: # define volumes on azure file share, these folders are already present there
+  pgdata:
+  shared:
+
+networks:
+  project:
+    driver: bridge
+    name: project-network
+    attachable: false
