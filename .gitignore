@@ -2,3 +2,4 @@
 *.crt
 venv/
 .DS_Store
+tmp/
