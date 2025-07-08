@@ -13,6 +13,8 @@ volumes:
    driver: local
  logstashdata01:
    driver: local
+ ollama:
+    driver: local
 
 networks:
  default:
@@ -151,3 +153,10 @@ services:
      timeout: 10s
      retries: 120
 
+ ollama:
+  image: ollama/ollama
+  container_name: ollama
+  volumes:
+    - ollama:/root/.ollama
+  ports:
+    - "11434:11434"
