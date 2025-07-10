@@ -3,7 +3,8 @@ from sentence_transformers import SentenceTransformer
 
 class RAG():
     
-    def __init__(self, data_path, field_to_encode, index_name, encoder, encoder_model, llm_model, es_client, ollama_client=None):
+    def __init__(self, data_path, field_to_encode, index_name, encoder, encoder_model, llm_model, es_client, ollama_client=None, answer_language='english'):
+        
         self.data_path = data_path
         self.field_to_encode = field_to_encode
         self.index_name = index_name
@@ -12,27 +13,28 @@ class RAG():
         self.llm_model = llm_model
         self.es_client = es_client  
         self.ollama_client = ollama_client  
+        self.answer_language = answer_language
 
     def fit(self):
         """
         Uploads documents to the Elasticsearch index.
         """
 
-        with open(self.path, 'rt') as f_in:
+        with open(self.data_path, 'rt') as f_in:
             docs_raw = json.load(f_in)
 
         docs = docs_raw[0]['documents']
 
-        mapping = self.define_mapping(docs)
+        mapping = self._define_mapping(docs)
         
-        docs, mapping = self.encode_documents(docs, mapping, self.ollama_client, self.field_to_encode)
+        docs, mapping = self._encode_documents(docs, mapping)
 
         self.es_client.indices.delete(index=self.index_name, ignore_unavailable=True)
         self.es_client.indices.create(index=self.index_name, body=mapping)
         for doc in docs: 
-            self.es_client.index(index="llm-doc", document=doc)
+            self.es_client.index(index=self.index_name, document=doc)
 
-        return docs
+        return self
     
     def predict(self, query):
         """
@@ -44,6 +46,7 @@ class RAG():
         - https://github.com/ollama/ollama-python?tab=readme-ov-file
         """
 
+        self._setup_ollama_model(self.llm_model)
         query_encoded = self._encode(query, encoder='ollama', model=self.ollama_client, model_name=self.llm_model)
         context = self._lookup_context(query, query_encoded)
         answer = self._answer_query(query, context)
@@ -98,6 +101,8 @@ class RAG():
         You're a course teaching assistant. Answer the QUESTION based on the CONTEXT from the FAQ database.
         Use only the facts from the CONTEXT when answering the QUESTION.
 
+        Answer only in {language}.
+
         QUESTION: {query}
 
         CONTEXT: 
@@ -107,8 +112,7 @@ class RAG():
         context = [[f'{key}: {value}' for key, value in context_item.items()] for context_item in context]
         context = "\n".join(context)
         
-        prompt = prompt_template.format(question=query, context=context).strip()
-
+        prompt = prompt_template.format(question=query, context=context, language=self.answer_language).strip()
 
         response = self.ollama_client.generate(
             model=self.llm_model,
@@ -121,6 +125,14 @@ class RAG():
         )
 
         return response['response']
+    
+    def _setup_ollama_model(self, model_name):
+        """Download and setup the Ollama model if not available."""
+        try:
+            self.ollama_client.show(model_name)
+        except:
+            print(f"Downloading {model_name}...")
+            self.ollama_client.pull(model_name)
 
     def _encode_documents(self, docs, mapping):
         """
@@ -130,6 +142,8 @@ class RAG():
         if self.encoder == "ollama":
             # Using Ollama to embed the documents
             model = self.ollama_client
+            self._setup_ollama_model(self.encoder_model)
+            
         elif self.encoder == "huggingface":
             # Using Hugging Face to embed the documents
             model = SentenceTransformer(self.encoder_model)
@@ -148,7 +162,7 @@ class RAG():
         """
         if encoder == "ollama":
             # Using Ollama to embed the documents
-            result = model.embed(model=model_name, input=string)[0].tolist() #TO TEST
+            result = model.embed(model=model_name, input=string)['embeddings'][0] #TO TEST
         elif encoder == "huggingface":
             # Using Hugging Face to embed the documents
             model = SentenceTransformer(model_name)
@@ -164,11 +178,11 @@ class RAG():
         Defines the mapping for the Elasticsearch index.
         """
 
-        unique_keys = set([doc.keys() for doc in docs])
+        unique_keys = {k for doc in docs for k in doc.keys()}
         mapping = {
         "mappings": {
             "properties": {
-                key: {"type": "text"} for key in unique_keys()
+                key: {"type": "text"} for key in unique_keys
                 }
             }   
         }
