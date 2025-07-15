@@ -45,9 +45,17 @@ class RAG():
         - https://collabnix.com/building-rag-applications-with-ollama-and-python-complete-2025-tutorial/
         - https://github.com/ollama/ollama-python?tab=readme-ov-file
         """
+        if self.encoder == "ollama":
+            # Using Ollama to embed the documents
+            model = self.ollama_client
+            self._setup_ollama_model(self.encoder_model)
+            
+        elif self.encoder == "huggingface":
+            # Using Hugging Face to embed the documents
+            model = SentenceTransformer(self.encoder_model)
 
         self._setup_ollama_model(self.llm_model)
-        query_encoded = self._encode(query, encoder='ollama', model=self.ollama_client, model_name=self.llm_model)
+        query_encoded = self._encode(query, encoder=self.encoder, model=model, model_name=self.encoder_model)
         context = self._lookup_context(query, query_encoded)
         answer = self._answer_query(query, context)
 
@@ -90,7 +98,9 @@ class RAG():
                             query=query, knn=knn_query) #, source=["text", "section", "question", "course"])
         
         for hit in res['hits']['hits']:
-            context.append(hit['_source'])
+            tmp = hit['_source']
+            tmp = {key: value for key, value in tmp.items() if not key.endswith('_encoded')}  # Remove '_encoded' keys
+            context.append(tmp)
 
         return context
 
@@ -110,9 +120,9 @@ class RAG():
         """.strip()
 
         context = [[f'{key}: {value}' for key, value in context_item.items()] for context_item in context]
-        context = "\n".join(context)
+        context = "\n\n".join(["\n".join(context_item) for context_item in context])
         
-        prompt = prompt_template.format(question=query, context=context, language=self.answer_language).strip()
+        prompt = prompt_template.format(query=query, context=context, language=self.answer_language).strip()
 
         response = self.ollama_client.generate(
             model=self.llm_model,
@@ -152,7 +162,7 @@ class RAG():
                 doc[f"{self.field_to_encode}_encoded"] = self._encode(doc[self.field_to_encode], encoder=self.encoder, model=model, model_name=self.encoder_model)
         
         
-        mapping["mappings"]["properties"][f"{self.field_to_encode}_encoded"] = {"type": "dense_vector", "dims": len(docs[0][f'{self.field_to_encode}_encoded']), "index": True, "similarity": "cosine"},
+        mapping["mappings"]["properties"][f"{self.field_to_encode}_encoded"] = {"type": "dense_vector", "dims": len(docs[0][f'{self.field_to_encode}_encoded']), "index": True, "similarity": "cosine"}
 
         return (docs, mapping)
 
