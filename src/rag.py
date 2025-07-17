@@ -1,6 +1,8 @@
 import json
 from sentence_transformers import SentenceTransformer
 
+from src.elasticsearch import save_docs
+
 class RAG():
     
     def __init__(self, data_path, field_to_encode, index_name, encoder, encoder_model, llm_model, es_client, ollama_client=None, answer_language='english'):
@@ -29,10 +31,8 @@ class RAG():
         
         docs, mapping = self._encode_documents(docs, mapping)
 
-        self.es_client.indices.delete(index=self.index_name, ignore_unavailable=True)
-        self.es_client.indices.create(index=self.index_name, body=mapping)
-        for doc in docs: 
-            self.es_client.index(index=self.index_name, document=doc)
+        # Save the documents to Elasticsearch
+        save_docs(self.es_client, self.index_name, mapping, docs)
 
         return self
     

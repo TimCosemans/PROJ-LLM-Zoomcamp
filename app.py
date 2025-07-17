@@ -2,131 +2,136 @@ import streamlit as st
 import time
 import uuid
 import os 
-from elasticsearch import Elasticsearch
+
 from ollama import Client
 import sys
 sys.path.append('./src')  # Adjust the path to your src directory
 
 from src.rag import RAG
+from src.elasticsearch import client
+from src.evaluate import relevance, save_results
 
-INDEX_NAME = "llm-doc"
+DOCS_INDEX_NAME = "llm-doc"
+RESULTS_INDEX_NAME = "app-results"
 
-#https://discuss.elastic.co/t/issue-connecting-python-to-elasticsearch-in-docker-environment/361507/2
-es_client = Elasticsearch(
-    hosts=["https://localhost:9200"],
-    basic_auth=('elastic', 'password'), #os.getenv("ELASTIC_PASSWORD")),
-    verify_certs=False,
-    max_retries=30,
-    retry_on_timeout=True,
-    request_timeout=30,
-)
-
+es_client = client(host="https://localhost:9200")
 ollama = Client(host='http://localhost:11434')
-
-def print_log(message):
-    print(message, flush=True)
 
 
 def main():
-    print_log("Starting the LLM application")
     st.title("Multilingual Course Assistant Tester")
 
+    variables_to_initialize = [
+        "conversation_id",
+        "encoded",
+        "answered",
+        "rag"
+    ]
+
     # Session state initialization
-    if "conversation_id" not in st.session_state:
-        st.session_state.conversation_id = str(uuid.uuid4())
-        print_log(
-            f"New conversation started with ID: {st.session_state.conversation_id}"
-        )
+    for var in variables_to_initialize:
+        if var not in st.session_state:
+            st.session_state[var] = None
 
     # Model selection
-    encoder = st.selectbox("Select an encoder:", ["ollama", "huggingface"])
-    if encoder == "ollama":
-        print_log("Using Ollama as the encoder")
-        encoder_model = st.selectbox(
+    st.session_state.encoder = st.selectbox("Select an encoder:", ["ollama", "huggingface"])
+    if st.session_state.encoder == "ollama":
+        st.session_state.encoder_model = st.selectbox(
             "Select a model:",
-            ["llama3.2", "mistral-small3.2", "magistral", "phi4-mini-reasoning"],
+            ["llama3.2", "mistral-small3.2"],
         )
     else:   
-        print_log("Using Hugging Face as the encoder")
         # For Hugging Face, we can use a fixed model or allow user selection
-        encoder_model = st.selectbox(
+        st.session_state.encoder_model = st.selectbox(
             "Select a model:",
             ["intfloat/multilingual-e5-small", "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"],
         )
     
-    llm_model = st.selectbox(
+    st.session_state.llm_model = st.selectbox(
         "Select a language model:",
-        ["llama3.2", "mistral-small3.2", "magistral", "phi4-mini-reasoning"],
+        ["llama3.2", "mistral-small3.2"],
+    )
+
+    st.session_state.language = st.selectbox(
+        "Select the answer language:",
+        ["english", "dutch", "french"],
     )
 
     if st.button("Encode"):
         # Dynamically construct the path to the data folder
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        data_path = os.path.join(script_dir, 'data/documents-llm.json')
+        st.session_state.data_path = os.path.join(script_dir, 'data/documents-llm.json')
 
-        rag = RAG(
-            data_path=data_path,
+        print('Encoding...')
+
+        st.session_state.rag = RAG(
+            data_path=st.session_state.data_path,
             field_to_encode='question',
-            index_name=INDEX_NAME,
-            encoder=encoder,
-            encoder_model=encoder_model,
-            llm_model=llm_model,
+            index_name=DOCS_INDEX_NAME,
+            encoder=st.session_state.encoder,
+            encoder_model=st.session_state.encoder_model,
+            llm_model=st.session_state.llm_model,
             es_client=es_client,
             ollama_client=ollama, 
-            answer_language='dutch'
+            answer_language=st.session_state.language
         )
 
-        rag = rag.fit()
+        # st.session_state.rag = rag.fit()
 
+        st.session_state.encoded = True
+
+        st.success("Encoding completed successfully!")
+        print("Encoding completed successfully!")
+
+    if st.session_state.encoded:
         # User input
-        user_input = st.text_input("Enter your question:")
+        st.session_state.user_input = st.text_input("Enter your question:")
 
         if st.button("Ask"):
-            print_log(f"User asked: '{user_input}'")
-            with st.spinner("Processing..."):
+            print('Processing user input...')
 
-                start_time = time.time()
-                answer = rag.predict(query)
-                end_time = time.time()
-                print_log(f"Answer received in {end_time - start_time:.2f} seconds")
-                st.success("Completed!")
-                st.write(answer)
+            start_time = time.time()
+            answer = st.session_state.rag.predict(st.session_state.user_input)
+            end_time = time.time()
 
-                # # Display monitoring information
-                # st.write(f"Response time: {answer_data['response_time']:.2f} seconds")
-                # st.write(f"Relevance: {answer_data['relevance']}")
-                # st.write(f"Model used: {answer_data['model_used']}")
-                # st.write(f"Total tokens: {answer_data['total_tokens']}")
-                # if answer_data["openai_cost"] > 0:
-                #     st.write(f"OpenAI cost: ${answer_data['openai_cost']:.4f}")
+            relevance_score, explanation = relevance(st.session_state.user_input, answer, ollama, st.session_state.llm_model)
 
-                # # Save conversation to database
-                # print_log("Saving conversation to database")
-                # save_conversation(
-                #     st.session_state.conversation_id, user_input, answer_data, course
-                # )
-                # print_log("Conversation saved successfully")
+            st.session_state.results = {
+                "conversation_id": st.session_state.conversation_id,
+                "encoder": st.session_state.encoder,
+                "encoder_model": st.session_state.encoder_model,
+                "llm_model": st.session_state.llm_model,
+                "user_input": st.session_state.user_input,
+                "answer": answer,
+                "answer_language": st.session_state.language,
+                "answer_time": int(end_time - start_time),  
+                "relevance": relevance_score,
+                "explanation": explanation
+            }
 
-                # # Feedback buttons
-                # col1, col2 = st.columns(2)
-                # with col1:
-                #     if st.button("+1"):
-                #         st.session_state.count += 1
-                #         print_log(
-                #             f"Positive feedback received. New count: {st.session_state.count}"
-                #         )
-                #         save_feedback(st.session_state.conversation_id, 1)
-                #         print_log("Positive feedback saved to database")
-                # with col2:
-                #     if st.button("-1"):
-                #         st.session_state.count -= 1
-                #         print_log(
-                #             f"Negative feedback received. New count: {st.session_state.count}"
-                #         )
-                #         save_feedback(st.session_state.conversation_id, -1)
-                #         print_log("Negative feedback saved to database")
+            st.session_state.answered = True
 
+            st.success("Completed!")
+            print("Processing completed!")
+            
+            st.write(answer)
+
+        if st.session_state.answered:
+            # Feedback buttons
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("+1"):
+                    st.session_state.results["user_feedback"] = 1
+                    save_results(es_client, st.session_state.results, index_name=RESULTS_INDEX_NAME)
+                    st.success("Feedback saved: +1")
+                    print("Feedback saved: +1")
+
+            with col2:
+                if st.button("-1"):
+                    st.session_state.results["user_feedback"] = -1
+                    save_results(es_client, st.session_state.results, index_name=RESULTS_INDEX_NAME)
+                    st.success("Feedback saved: -1")
+                    print("Feedback saved: -1")
 
 if __name__ == "__main__":
-    print_log("Course Assistant application started")
     main()
