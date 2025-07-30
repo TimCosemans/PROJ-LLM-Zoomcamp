@@ -50,3 +50,17 @@ def save_docs(es_client, index_name, mapping, docs, delete_index=True):
 
     return None 
 
+def define_simple_mapping(docs): 
+        """
+        Defines the mapping for the Elasticsearch index.
+        """
+
+        unique_keys = {k for doc in docs for k in doc.keys()}
+        mapping = {
+        "mappings": {
+            "properties": {
+                key: {"type": "keyword"} for key in unique_keys
+                }
+            }   
+        }
+        return mapping

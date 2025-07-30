@@ -8,7 +8,7 @@ import sys
 sys.path.append('./src')  # Adjust the path to your src directory
 
 from src.rag import RAG
-from src.elasticsearch import client
+from src.elasticsearch_utils import client
 from src.evaluate import relevance, save_results
 
 DOCS_INDEX_NAME = "llm-doc"

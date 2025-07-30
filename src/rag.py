@@ -1,7 +1,8 @@
 import json
 from sentence_transformers import SentenceTransformer
+import uuid 
 
-from src.elasticsearch import save_docs
+from src.elasticsearch_utils import save_docs, define_simple_mapping
 
 class RAG():
     
@@ -16,10 +17,11 @@ class RAG():
         self.es_client = es_client  
         self.ollama_client = ollama_client  
         self.answer_language = answer_language
+        self.id = uuid.uuid4()
 
-    def fit(self):
+    def fit(self, offline_evaluation=False):
         """
-        Uploads documents to the Elasticsearch index.
+        Uploads documents to the Elasticsearch index. Option to also perform offline evaluation of the RAG system.
         """
 
         with open(self.data_path, 'rt') as f_in:
@@ -27,7 +29,7 @@ class RAG():
 
         docs = docs_raw[0]['documents']
 
-        mapping = self._define_mapping(docs)
+        mapping = define_simple_mapping(docs)
         
         docs, mapping = self._encode_documents(docs, mapping)
 
@@ -55,15 +57,14 @@ class RAG():
             model = SentenceTransformer(self.encoder_model)
 
         self._setup_ollama_model(self.llm_model)
-        query_encoded = self._encode(query, encoder=self.encoder, model=model, model_name=self.encoder_model)
-        context = self._lookup_context(query, query_encoded)
+        context = self.lookup_context(query)
         answer = self._answer_query(query, context)
 
         return answer
 
 
 
-    def _lookup_context(self, query, query_encoded):
+    def lookup_context(self, query):
         """
         Retrieves relevant context from the Elasticsearch index based on the query.
 
@@ -79,23 +80,26 @@ class RAG():
         - https://github.com/elastic/elasticsearch-labs/tree/main/notebooks/search
         - https://www.elastic.co/docs/solutions/search/vector/knn
         """
+        query_encoded = self.encode(query)
+
         context = []
 
         knn_query = {
-            "field": "question_encoded",
+            "field": f"{self.field_to_encode}_encoded",
             "query_vector": query_encoded,
             "k": 5,
             "num_candidates": 10000, 
         }
         query = {
             "match": {
-            "question": {
+            f"{self.field_to_encode}": {
                 "query": query,
             }
             }
         }
         res = self.es_client.search(index=self.index_name, 
-                            query=query, knn=knn_query) #, source=["text", "section", "question", "course"])
+                            query=query, knn=knn_query) #,
+                            #rank={'rrf': {}}) #, source=["text", "section", "question", "course"])
         
         for hit in res['hits']['hits']:
             tmp = hit['_source']
@@ -149,52 +153,37 @@ class RAG():
         Encodes the documents using the specified encoder model.
         """
 
+
+        for doc in docs:
+                doc[f"{self.field_to_encode}_encoded"] = self.encode(doc[self.field_to_encode])
+        
+        
+        mapping["mappings"]["properties"][f"{self.field_to_encode}_encoded"] = {"type": "dense_vector", 
+                                                                                "dims": len(docs[0][f'{self.field_to_encode}_encoded']), 
+                                                                                "index": True, 
+                                                                                "similarity": "cosine"}
+
+        return (docs, mapping)
+
+    def encode(self, string):
+        """
+        Encodes a single document using the specified encoder model.
+        """
+            
         if self.encoder == "ollama":
             # Using Ollama to embed the documents
             model = self.ollama_client
             self._setup_ollama_model(self.encoder_model)
-            
+            result = model.embed(model=self.encoder_model, input=string)['embeddings'][0] #TO TEST
         elif self.encoder == "huggingface":
             # Using Hugging Face to embed the documents
             model = SentenceTransformer(self.encoder_model)
-
-        for doc in docs:
-                doc[f"{self.field_to_encode}_encoded"] = self._encode(doc[self.field_to_encode], encoder=self.encoder, model=model, model_name=self.encoder_model)
-        
-        
-        mapping["mappings"]["properties"][f"{self.field_to_encode}_encoded"] = {"type": "dense_vector", "dims": len(docs[0][f'{self.field_to_encode}_encoded']), "index": True, "similarity": "cosine"}
-
-        return (docs, mapping)
-
-    def _encode(self, string, encoder, model=None, model_name=None):
-        """
-        Encodes a single document using the specified encoder model.
-        """
-        if encoder == "ollama":
-            # Using Ollama to embed the documents
-            result = model.embed(model=model_name, input=string)['embeddings'][0] #TO TEST
-        elif encoder == "huggingface":
-            # Using Hugging Face to embed the documents
-            model = SentenceTransformer(model_name)
             # Transforming the title into an embedding using the model
             result = model.encode(string).tolist()
         else:
-            raise ValueError(f"Unknown encoder: {encoder}")
+            raise ValueError(f"Unknown encoder: {self.encoder}")
 
         return result
 
-    def _define_mapping(self, docs): 
-        """
-        Defines the mapping for the Elasticsearch index.
-        """
-
-        unique_keys = {k for doc in docs for k in doc.keys()}
-        mapping = {
-        "mappings": {
-            "properties": {
-                key: {"type": "text"} for key in unique_keys
-                }
-            }   
-        }
-        return mapping
+    
     
