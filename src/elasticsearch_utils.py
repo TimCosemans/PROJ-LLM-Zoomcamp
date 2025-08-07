@@ -64,3 +64,22 @@ def define_simple_mapping(docs):
             }   
         }
         return mapping
+
+def get_recent_docs(es_client, index_name, conversation_id, size=10):
+    """
+    Retrieve recent documents from Elasticsearch index.
+    """
+    query = {
+        "query": {
+            "match": {
+                "conversation_id": conversation_id
+            }
+        },
+        "size": size,
+        "sort": [
+            {"timestamp": {"order": "desc"}}
+        ]
+    }
+
+    response = es_client.search(index=index_name, body=query)
+    return [hit['_source'] for hit in response['hits']['hits']]

@@ -1,0 +1,431 @@
+id,question
+1,Can you still join a course if you just discovered it?
+1,What is required to receive a certificate in this course?
+1,Is the course still accepting submissions when you join?
+1,How do I submit my project for a certificate in this course?
+1,What happens if I don't submit my project while the course is accepting submissions?
+2,When will I receive confirmation after registering for the course?
+2,Can I submit homework before receiving the registration confirmation email?
+2,What is the purpose of registering for the course before its start date?
+2,Will my registration be checked against a list if the form is open?
+2,How long do I have to wait for confirmation after signing up for the course?
+3,What is the video/zoom link to the stream for the “Office Hours” or live/workshop sessions?
+3,Where will you see the video URL posted before it begins?
+3,How do students participate in the live session?
+3,To whom is the zoom link published?
+3,Where should questions be submitted?
+4,What is the process for accessing SaturnCloud if you miss the initial form deadline?
+4,How do pre-existing users of SaturnCloud access free hours?
+4,Is there a specific link or page to submit your email for access to SaturnCloud?
+4,Can you explain how to request free hours via chat in SaturnCloud?
+4,What is the correct way to mention 'llm zoomcamp' when requesting free hours on SaturnCloud?
+5,How many free hours do we get per month?
+5,What is the limit of our free hours per month?
+5,Can the free tier's hardware configuration affect our free hours?
+5,Are there any restrictions on the free hours we receive?
+5,Is the free hour amount fixed or variable?
+6,What is the maximum allowed resource usage per month for SaturnCloud?
+6,Why should you set Shutout After in settings if all allocated hours are used?
+6,Where can you try to find hours that are out of allocation?
+6,How does leaving your notebooks running affect your usage?
+6,Who or what sent this message about exhausted hours?
+7,What are some popular cloud alternatives with GPU?
+7,Are free hours quota and billing separate in all cloud services?
+7,Can you change the configuration of a cloud service without affecting your free hours quota?
+7,How do I determine if a cloud service has restrictions on installing certain applications?
+7,Why is it necessary to check the terms of a free tier versus a paid tier for a cloud service?
+8,What is required to be displayed on your certificate?
+8,How do I change my nickname/displayed-name in my course profile?
+8,Why would you want to remain anonymous on the leaderboard?
+8,Where can I find my entry on the leaderboard?
+8,What information from my identification documents will appear on my certificate?
+9,Can I get a certificate for completing a self-paced course?
+9,What is the condition for awarding certificates in this course?
+9,In what mode can peer-review of capstone projects occur?
+9,Is it possible to receive feedback on submitted projects after the form has closed?
+9,Under what circumstance are certificates not awarded?
+10,Can you still get a certificate if you missed the first homework?
+10,Is passing the Capstone project enough to obtain the certificate?
+10,Are homework assignments mandatory for getting the certificate?
+10,Do points awarded from the Capstone project count towards your rank on the leaderboard?
+10,Can missing a homework assignment affect your chances of receiving a certificate?
+11,Will the course material change until a module is ready?
+11,Is it recommended to work on homework in advance?
+11,Why does next week's homework/content keep changing?
+11,Can you guarantee the final version of the course material?
+11,Are there any risks associated with working on homework in advance?
+12,What is the ID of this course?
+12,When will the course be offered next?
+12,By what name is the course being taught in the upcoming Summer 2025?
+12,In which section are general course-related questions located?
+12,"Who will be teaching the course, based on the provided text?"
+13,Are there any lectures/videos?
+13,Where are the bookmarks and pinned links located?
+13,Is DataTalks.Club’s YouTube account relevant to this course?
+13,What should I check in relation to DataTalks.Club?
+13,How can I access course-related videos?
+14,What is the recommended RAM allocation for WSL2?
+14,How can you verify changes made to the .wslconfig file in Windows?
+14,Which command should be run after making changes to the .wslconfig file?
+14,Where should the .wslconfig file be created under the Windows user profile directory?
+14,What is the purpose of creating a .wslconfig file?
+15,What is the OpenAI command that may produce an error due to insufficient credits?
+15,Which module in the tutorial covers this topic?
+15,What type of account issue causes this error?
+15,Why does running this command cause an error for some users?
+15,What resource runs out when this error occurs?
+16,What type of error is returned when the user has exceeded their current quota?
+16,Where can you add funds to your OpenAI API account?
+16,How much money must be added to the account to avoid RateLimitError?
+16,What should you do after adding credits to your account in order to receive a successful return code?
+16,What specific step is required to resolve the errors related to insufficient quota?
+17,What is the current openai version?
+17,Which section of the course contains this topic?
+17,How to update openai from 0.27.0 to any 1.x version?
+17,What is the id of the module with this topic?
+17,Why is there an error importing OpenAI from openai?
+18,How much will I have to spend at least for one unit to use the Open AI API?
+18,"What is the lowest cost of using the OpenAI API, according to the information provided?"
+18,At what price can you recharge from using the OpenAI API?
+18,Is there a minimum amount that needs to be spent on the first unit to use the Open AI API?
+18,How much did the user spend on their first Open AI API unit?
+19,What alternatives are available for completing course homeworks for free?
+19,Does the use of OpenAI API require a subscription and payment for this course?
+19,Where can you find the list of alternative options posted in the course?
+19,Is there a fee associated with using the OpenAI API for this course?
+19,Can you complete the course homeworks without paying for the service?
+20,What is the likely cause of an Elasticsearch error when running a docker container with insufficient RAM?
+20,Why was the RAM size specified in the configuration for the docker run command?
+20,How can a failed Elasticsearch server be fixed by reducing its resource usage?
+20,What sysctl parameter needs to be adjusted to increase the Java machine's memory within the container?
+20,What is another possible solution to the memory issues faced by Elasticsearch when running in a docker container?
+21,F
+21,a
+21,i
+21,l
+21,e
+21,d
+21, 
+21,t
+21,o
+21, 
+21,p
+21,a
+21,r
+21,s
+21,e
+21, 
+21,q
+21,u
+21,e
+21,s
+21,t
+21,i
+21,o
+21,n
+21,s
+22,How does one prevent data loss when stopping a container in Elasticsearch?
+22,What is the purpose of adding volume mapping to a Docker run command?
+22,How do you ensure that data persists in Elasticsearch even after the container stops running?
+22,What is the effect of setting discovery.type=single-node in a Docker Elastic image?
+22,Why is xpack.security.enabled set to false in a Docker Elastic image?
+23,What is a safe and easy way to store API keys?
+23,How should you handle your API keys file in a Git repository?
+23,What command do you need to install to load a YAML file?
+23,Where can you easily replace the 'api_key' value without loading environment variables?
+23,Who added the information about storing API keys in a YAML file?
+24,What is the error message displayed when trying to use the OPENAI_API_KEY client option without setting it?
+24,How can one install the python-dotenv library to load environment variables from a .envrc file?
+24,What is the purpose of the 'secrets' section in GitHub Codespaces settings?
+24,Why does the OPENAI_API_KEY need to be set either by passing it to the client or setting an environment variable?
+24,How can one create a secret called OPENAI_API_KEY for use in specific repositories on GitHub?
+25,What is the first step to use Ollama models for llm-zoomcamp tasks?
+25,How do you download ollama for Ubuntu?
+25,"Where can you explore more open-source LLMs like Llama3, Phi3, and Mistral?"
+25,What command do you need to type in command prompt to download a model in Ollama?
+25,Can you use the Ollama models for inference and llm-zoomcamp tasks directly without using any API?
+26,What is the name of the python library that can be used to get the number of tokens?
+26,Is an OpenAI API key required to estimate the number of OpenAI tokens in a homework question?
+26,What is the name of the model mentioned as gpt-4o model?
+26,How does one estimate the number of OpenAI tokens asked in a homework question using tiktoken?
+26,Can you use the code provided in the question to get the number of tokens?
+27,Can you use Groq for your experiments and project?
+27,Do you need access to paid services to complete homework?
+27,Where can you find documentation pages for the LLM platform of your choice?
+27,What is the purpose of adjusting the code for a specific LLM platform?
+27,How will you handle the adjustment of the code for a different LLM platform?
+28,Can I use open-source alternatives to OpenAI API?
+28,What is the section name in module 1: Introduction where this information can be found?
+28,Where can you find more information on the OpenAI API?
+28,Is the provided text an answer to a question about using the OpenAI API?
+28,Can the information from 'open-ai-alternatives.md' in the 'module 1 folder' be used directly?
+29,What is the typical order of operations when indexing data?
+29,Why would adding index settings before data be necessary for filtering and querying?
+29,In what section was the provided text located in the record?
+29,What is the issue that 'Returning Empty list after filtering my query' suggests has occurred?
+29,How does one ensure success in applying filters and queries to their data?
+30,What is the ID of the given record?
+30,In which module is the given record located?
+30,What is the text of the given record?
+30,What type of question does the given record contain?
+30,What section of the curriculum is associated with the given record?
+31,What section contains information about Saturn Cloud issues?
+31,How can you quickly search this document for specific content?
+31,What is the name of the module that discusses Open-Source LLMs?
+31,Who or what are associated with issues in the document?
+31,How do you access a specific part of the document?
+32,"Once you are in jupyter notebook from SaturnCloud, what should you do next?"
+32,What is the command to navigate to your project directory?
+32,How do you push changes to your Github repository using SSH?
+32,What is the purpose of the 'git add .' command?
+32,What is the meaning of the '-m' option in the git commit command?
+33,What is the Python module needed to access the cache?
+33,How can you remove a directory in Python?
+33,"On SaturnCloud, how do you clean out the hugging face model cache after using it?"
+33,How can you print a variable's value in Python?
+33,What library should be imported to use the TRANSFORMERS_CACHE variable?
+34,Can you backup and restore your Elasticsearch index from one Docker container to another?
+34,How do you create a snapshot of your Elasticsearch index in a Docker container?
+34,What is the command to copy the backup to your machine?
+34,In what Docker Compose service do you restart your new Elasticsearch container?
+34,"After restoring the snapshot, how do you rename the original index name?"
+35,What is the recommended method to limit memory usage for an Elasticsearch container?
+35,How can I restrict CPU usage for an Elasticsearch service in a docker-compose.yaml file?
+35,What is the specific configuration option used to limit CPU usage in Docker Compose?
+35,Can you specify the amount of memory to be used by the ElasticSearch container?
+35,Where can I find the setting to control the number of CPUs that the Elasticsearch container can utilize?
+36,"To inspect the content of a file inside a Docker container, what command can be used?"
+36,How to view the content of a specific file in a Docker container?
+36,What is the purpose of using ‘apt-get’ for installing vim or nano?
+36,What is the command to exit a file edited in vim?
+36,How to see the content of a file directly without editing it?
+37,What Docker volume mount option is used to add a semicolon (';') and a capital letter 'C' to the end of a Windows path?
+37,In which section can you find information about mounting volumes using Docker?
+37,What command uses '${PWD}' to set up the Docker volume mount for Open-Source LLMs in Module 2?
+37,What is the suggested line to use instead when mounting the current volume to Docker?
+37,For which quarter does the provided Docker volume mount instruction apply?
+38,Why does Docker Desktop take so long to increase resources?
+38,What is the recommended memory limit for Docker Desktop on MacBook Air M1?
+38,How do you set the swap size for Docker Desktop?
+38,Who added changes to Docker Desktop?
+38,Which section of the course covers Open-Source LLMs?
+39,What is Docker used for?
+39,How can you clean docker cache?
+39,What does 'docker system prune' do?
+39,Who are Open-Source LLMs targeted at?
+39,What section contains the 'docker system prune -a' command?
+40,What error does 'Ollama: “Error: pull model manifest: 503: no healthy upstream”' indicate when pulling a model with Ollama?
+40,How long should you wait before attempting to pull the model again after a network connection failure?
+40,Why is it recommended to wait for 2 or 3 minutes before trying to pull the model again?
+40,What type of error is described as 'temporary' in this context?
+40,Who added this information about the error to the record?
+41,What is the solution to the Connection error in Ollama when running locally on Colab?
+41,Why does pulling one of these models first resolve the error in Ollama?
+41,Where can you find a step-by-step guide for running Ollama on Google Colab's free tier?
+41,What is the error code returned by localhost:11434/v1/ in Ollama?
+41,How to fix the 'model XXX not found' error in Ollama?
+42,What is the id of the Ollama model?
+42,How can remove Ollama model?
+42,Which section does Ollama belong to?
+42,What is the command to remove Ollama model?
+42,In which module can Ollama be removed?
+43,What type of error occurred during the execution of Ollama?
+43,Which system memory issue is causing the RAM memory problem in Elasticsearch?
+43,How to fix the RAM memory issue in Elasticsearch?
+43,What is the image used for the Docker ElasticSearch container?
+43,Why is the 'xpack.security.enabled' environment variable set to false?
+44,What is the recommended model to use for the Mistral-7B-v0.1
+44,Which part of the code snippet is responsible for accessing the token?
+44,What is the name of the pre-trained model from which the tokenizer and access_token are derived?
+44,How do you obtain an access token in order to utilize the Mistral-7B-v0.1?
+44,Why were you unable to get access to the Mistral-7B-v0.1 despite accepting terms on HF?
+45,What is required to install the transformers module?
+45,Where can you find the transformers module?
+45,Which section of the guide discusses Open-Source LLMs?
+45,What error does Python throw when trying to import 'transformers.cache_utils'?
+45,How do you install the transformers module in Python?
+46,What type of exception is raised when data does not match any variant of an untagged enum?
+46,Where can you install the transformers library directly from GitHub?
+46,Which Python module contains the PyPreTokenizerTypeWrapper class?
+46,How to install the transformers library using pip?
+46,In which section of Module 2 is the PyPreTokenizerTypeWrapper class located?
+47,What is the version of the protobuf library installed?
+47,Who added this installation to the project?
+47,In what section was the installation documented?
+47,What error occurs when trying to import google.protobuf.pyext?
+47,Which Python module is used to access the protobuf library?
+48,What is the step to get the transformer used on a certain model?
+48,How do you calculate the length of an outputted tensor from a string encoded using a transformer?
+48,"Using the tokenizer of Google/GemMLL, how do you make your token secret?"
+48,What section contains instructions related to Open-Source LLMs?
+48,What is the first step in searching with the model name on Hugging Face?
+49,What is the last known version of CUDA that can be used with a cloud environment like Saturn Cloud?
+49,Which package for python is supported for that version of CUDA?
+49,What does cu121 mean in terms of support for CUDA versions?
+49,How do you install all needed packages using pip?
+49,What command needs to be executed after installing the required packages?
+50,What version of Elasticsearch should be installed for compatibility with earlier modules?
+50,Why is it recommended to use 'body' instead of 'document' in Elasticsearch?
+50,How can conda users update to elasticsearch 8.x if they encounter a 'PackagesNotFoundError'?
+50,What is the effect of adding the 'conda-forge' channel and setting the channel priority to 'strict' when installing elasticsearch using conda?
+50,In what context would using 'body' instead of 'document' be necessary?
+51,What is the ID of the record?
+51,In which module does this record belong to?
+51,How did 'knn' affect the Elasticsearch search function?
+51,What type of error occurred in the provided Elasticsearch code?
+51,Who can confirm that 'This worked for me:' was successful?
+52,What is the Docker command to run a container based on an ElasticSearch image?
+52,In which section of the course is this module located?
+52,What is the port number that needs to be forwarded in GitHub Codespaces or VSCode?
+52,What is the value of 'discovery.type' set to in the Elasticsearch configuration?
+52,What is the error message when a new connection to ElasticSearch fails?
+53,What is the expected range for scores obtained from a cosine similarity measure in Elasticsearch's index settings?
+53,"Why does the final score contain text relevance scores above 1, despite using a 'cosine' similarity measure?"
+53,How does adding an 'explain' parameter to a search query affect the final score?
+53,What ranking function calculates the score to represent a document's relevance with respect to a query in Elasticsearch?
+53,Why is it necessary to add a 'match' filter in a query to trigger the usage of BM25 ranking algorithm?
+54,What package does the record recommend for this module homework?
+54,Why can 'sentence_transformers' be installed as simply as pip install sentence-transformers?
+54,Which command is used to install the recommended package?
+54,What is the section of the record where the question 'Not module named “sentence_transformers”' appears?
+54,How does the author suggest installing 'sentence_transformers'?
+55,What is the error message encountered while creating an index?
+55,Why was the command curl -X GET 'http://localhost:9200/_cluster/health?pretty' showing a red status?
+55,What was the problem with not having enough disk space in the computer for Docker images?
+55,Which command helped remove unused Docker images and prune the system?
+55,Who added this solution to resolve the issue?
+56,What type of error does the vector search function within the evaluate function produce?
+56,Why is the query passed to the search_function incorrectly transformed?
+56,What data structure should be received by the search function instead of a dictionary?
+56,Can you explain what happens when running the vector search function with a float and a dict?
+56,How can you resolve the issue of passing a dictionary to the search function?
+57,What is the Python module used to calculate the maximum value of a numpy array?
+57,Which part of the given code snippet contains the calculation for max_value?
+57,"In the provided record, what is the 'section' referred to?"
+57,What operation does the 'max()' function perform on a numpy array?
+57,How can you obtain the maximum value from an array in Python?
+58,What is the meaning of cosine similarity?
+58,How is cosine similarity calculated?
+58,In what context is cosine similarity used most often?
+58,What does a cosine similarity value of 1 indicate?
+58,What does a cosine similarity value of -1 represent?
+59,What is a document in ElasticSearch?
+59,What are key-value pairs that contain your data called?
+59,How are JSON objects serialized to store data?
+59,In which module can you find information about documents?
+59,What format does the given text describe for storing data?
+60,What is the outcome of running 'docker run --help'?
+60,How to resolve the conflict error when trying to use a container name already in use?
+60,What does the score formula calculate in the given Elastic search metric example?
+60,What is the relationship between the dot_product metric and comparing results with own ones?
+60,What happens to Elastic search scores when 'es_score' equals 0.5?
+61,What version of sentence-transformers can be used to avoid warnings?
+61,How do I suppress a warning about a model made on an older version of sentence-transformers?
+61,What is the recommended way to install sentence-transformers version 3.0.0 or higher?
+61,Why would I need to upgrade to sentence-transformers v3.0.0?
+61,How can I avoid seeing warnings when using the 'multi-qa-mpnet-base-dot-v1' model?
+62,What error occurs when trying to import PyTorch in Windows OS?
+62,Which Visual Studio version should be used for installing the required redistributable?
+62,Where is the 'fbgemm.dll' file located?
+62,Why is a system restart necessary after installing the Visual C++ Redistributable?
+62,How can one find more details about this error?
+63,What is the PostgreSQL host set to in the .env file?
+63,How does the author of the prep.pypsycopg2 module fix the OperationalError when running python?
+63,What host name cannot be translated to an address in the error message?
+63,Why does a No such host is known error occur?
+63,Where is the PostgreSQL configuration located?
+64,What is the default maximum width of a column in pandas dataframe visualization?
+64,"To display an entire text content in a column, what option do you need to set?"
+64,How can you view the entire Explanation column content in the LLM-as-judge section?
+64,"Why would you use 'pd.set_option('display.max_colwidth', None)' in your code?"
+64,What is the value of the display_max_colwidth option if it's not specified?
+65,What is the primary library used for numerical operations in Python?
+65,How to normalize a vector in Pandas DataFrame or Series?
+65,What does the 'lambda' function do in the given code snippet?
+65,How to calculate the magnitude (length) of a vector?
+65,What is applied to each value in a Pandas DataFrame column using '.apply()'?
+66,What is the syntax to calculate the 75th percentile or 0.75 quantile of a Pandas DataFrame column (or Series)?
+66,In what module of Pandas can you find information on computing percentiles?
+66,How do you specify the percentage value for calculating the quantile in Pandas?
+66,What is the result type expected when using the quantile() function in Pandas?
+66,Where does the 'quantile' function belong to in a Pandas DataFrame or Series?
+67,"What are the three commands used to remove Docker containers, images, and volumes?"
+67,How can I delete all running Docker containers using a single command?
+67,What is the purpose of the '-f' option in the Docker rm command?
+67,Which command can be used to remove all Docker images from the system?
+67,Can you explain how to use the Docker volume rm command?
+68,What is the service name and port used for elasticsearch as per the docker-compose.yaml file?
+68,How do you access elasticsearch using the information from the docker-compose.yaml file?
+68,Can you provide a connection string example using the service name and port from the docker-compose.yaml file?
+68,"According to the provided text, what is the correct way to write the URL for elasticsearch in the docker-compose.yaml file?"
+68,What does the provided <http://> and :<port> part of the url refer to?
+69,Is it a group project?
+69,Is the capstone a solo project?
+69,What type of project is the capstone?
+69,Is the capstone the final project for the course?
+69,Is the capstone project a group effort?
+70,How many projects can we submit for the experience and exposure?
+70,What is considered as a failure in the first attempt submission.
+70,Can I still catch up with the certification if I miss the first submission window?
+70,Is participating in peer-review of 3 peers necessary for the certification?
+70,What happens to the first submission that doesn't count towards the certification?
+71,Does the competition count as the capstone project?
+71,Can a team participate in the math-kaggle-llm-competition for the capstone?
+71,Is the participation in the math-kaggle-llm-competition individual or group?
+71,Can one participate in both the capstone and the math-kaggle-llm-competition?
+71,Does participating in the competition affect the status of the capstone?
+72,Who will be responsible for grading your capstone project?
+72,How will your final grade be determined?
+72,What are you required to follow during the peer review process?
+72,Will you have a say in how your capstone project is evaluated?
+72,What happens if you don't comply with the evaluation rule?
+73,What library can I use instead of ElasticSearch?
+73,Can my project be reviewed by peer-reviewers if it uses a different library than ElasticSearch?
+73,Do I need to document my project's library choice for peer-reviewers?
+73,Is it required to use a specific library in order to reproduce the project?
+73,Can any library be used with the requirement of proper documentation?
+74,What is the id of the record?
+74,What is the text of the record?
+74,In which section is the record located?
+74,What is the question associated with this record?
+74,What is the topic or category of this record?
+75,Can I use the workshop materials for my own projects or share them with others?
+75,What is the main goal of dlt?
+75,Can the content of this workshop be used for a capstone project?
+75,Who added the information about using dlt for other zoomcamps?
+75,Is dlt open-source?
+76,What is the ID of the error message?
+76,Which section contains this workshop?
+76,What is the name of the pipeline setting that needs to be changed?
+76,Why does the code throw a FileNotFoundError?
+76,How can you create a missing table in the database?
+77,What is the name of the table that was opened in line 3?
+77,Which error message is displayed when running main(): 'Table notion_pages___homework does not exist.'
+77,Why do you need to call db.create_table() before opening a table?
+77,What is the name of the section where this error occurred?
+77,How can you fix the error that occurs when trying to open the table?
+78,What information can be obtained from db.table_names()?
+78,How do I identify tables in the database?
+78,What is the purpose of using db.table_names()?
+78,Which command lists all the tables in the db?
+78,What function can be used to list all the tables in the database?
+79,Does DLT have connectors to ClickHouse or StarRocks?
+79,Is DLT open to contributions for adding new connectors?
+79,What is the current status of DLT's connector development for StarRocks?
+79,Can DLT be used with StarRocks without additional setup?
+79,Are there any existing connections available for ClickHouse?
+80,What error do you get if a key is incorrect or access to it needs to be granted?
+80,What section of the workshop contains this information?
+80,How should you handle the '401 Client Error' when searching for data in Notion API?
+80,Is the notebook mentioned in the text supposed to have secret access?
+80,What is the correct URL for searching data in the Notion API?
+81,"How to fix a problem where the requests library only installs v2.28 instead of v2.32, which is required for lancedb?"
+81,What does the 'requests @ https://github.com/psf/requests/archive/refs/tags/v2.32.3.zip' installation command do?
+81,How to install the latest version of the requests library directly from its source?
+81,Why can't I find the correct version of the requests library that matches my requirements?
+81,What is the purpose of using a specific archive URL for the requests library?
+82,What is the solution to get rid of the 'connection refused' error when prompted to run ollama RAG?
+82,How do you restart the ollama server in order to resolve the error?
+82,Can you explain why stopping and restarting a cell will require rerunning the ollama serve cell first after restarting the server?
+82,What does Abiodun Gbadamosi have added to this text?
+82,In what section of the record can you find more information about the workshops?

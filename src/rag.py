@@ -6,20 +6,21 @@ from src.elasticsearch_utils import save_docs, define_simple_mapping
 
 class RAG():
     
-    def __init__(self, data_path, field_to_encode, index_name, encoder, encoder_model, llm_model, es_client, ollama_client=None, answer_language='english'):
+    def __init__(self, data_path, field_to_encode, index_name, encoder, encoder_model, n_context_docs, llm_model, es_client, ollama_client=None, answer_language='english'):
         
         self.data_path = data_path
         self.field_to_encode = field_to_encode
         self.index_name = index_name
         self.encoder = encoder
         self.encoder_model = encoder_model
+        self.n_context_docs = n_context_docs
         self.llm_model = llm_model
         self.es_client = es_client  
         self.ollama_client = ollama_client  
         self.answer_language = answer_language
-        self.id = uuid.uuid4()
+        self.id = str(uuid.uuid4())
 
-    def fit(self, offline_evaluation=False):
+    def fit(self):
         """
         Uploads documents to the Elasticsearch index. Option to also perform offline evaluation of the RAG system.
         """
@@ -47,14 +48,6 @@ class RAG():
         - https://collabnix.com/building-rag-applications-with-ollama-and-python-complete-2025-tutorial/
         - https://github.com/ollama/ollama-python?tab=readme-ov-file
         """
-        if self.encoder == "ollama":
-            # Using Ollama to embed the documents
-            model = self.ollama_client
-            self._setup_ollama_model(self.encoder_model)
-            
-        elif self.encoder == "huggingface":
-            # Using Hugging Face to embed the documents
-            model = SentenceTransformer(self.encoder_model)
 
         self._setup_ollama_model(self.llm_model)
         context = self.lookup_context(query)
@@ -79,28 +72,45 @@ class RAG():
         - https://www.elastic.co/docs/reference/elasticsearch/clients/python/examples
         - https://github.com/elastic/elasticsearch-labs/tree/main/notebooks/search
         - https://www.elastic.co/docs/solutions/search/vector/knn
+        - https://github.com/elastic/elasticsearch-labs/blob/main/notebooks/search/02-hybrid-search.ipynb
+        - https://www.elastic.co/guide/en/elasticsearch/reference/8.18/rrf.html#CO875-3
         """
         query_encoded = self.encode(query)
 
         context = []
 
-        knn_query = {
-            "field": f"{self.field_to_encode}_encoded",
-            "query_vector": query_encoded,
-            "k": 5,
-            "num_candidates": 10000, 
-        }
-        query = {
-            "match": {
-            f"{self.field_to_encode}": {
-                "query": query,
+        query_full = {
+            "rrf": { 
+                "retrievers": [
+                    {
+                        "standard": { 
+                            "query": {
+                                "match": {
+                                    f"{self.field_to_encode}": {
+                                        "query": query,
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "knn": {
+                            "field": f"{self.field_to_encode}_encoded",
+                            "query_vector": query_encoded,
+                            "k": 50,
+                            "num_candidates": 100, 
+                        }
+                    }
+                ],
+                "rank_window_size": 60,
+                "rank_constant": 10
             }
-            }
         }
-        res = self.es_client.search(index=self.index_name, 
-                            query=query, knn=knn_query) #,
-                            #rank={'rrf': {}}) #, source=["text", "section", "question", "course"])
         
+        res = self.es_client.search(index=self.index_name,
+                                    retriever=query_full, 
+                                    size=self.n_context_docs)
+
         for hit in res['hits']['hits']:
             tmp = hit['_source']
             tmp = {key: value for key, value in tmp.items() if not key.endswith('_encoded')}  # Remove '_encoded' keys
@@ -174,7 +184,7 @@ class RAG():
             # Using Ollama to embed the documents
             model = self.ollama_client
             self._setup_ollama_model(self.encoder_model)
-            result = model.embed(model=self.encoder_model, input=string)['embeddings'][0] #TO TEST
+            result = model.embed(model=self.encoder_model, input=string)['embeddings'][0] 
         elif self.encoder == "huggingface":
             # Using Hugging Face to embed the documents
             model = SentenceTransformer(self.encoder_model)

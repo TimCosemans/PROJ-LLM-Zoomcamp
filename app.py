@@ -8,7 +8,7 @@ import sys
 sys.path.append('./src')  # Adjust the path to your src directory
 
 from src.rag import RAG
-from src.elasticsearch_utils import client
+from src.elasticsearch_utils import client, get_recent_docs
 from src.evaluate import relevance, save_results
 
 DOCS_INDEX_NAME = "llm-doc"
@@ -21,8 +21,9 @@ ollama = Client(host='http://localhost:11434')
 def main():
     st.title("Multilingual Course Assistant Tester")
 
+    st.session_state.conversation_id = str(uuid.uuid4())
+
     variables_to_initialize = [
-        "conversation_id",
         "encoded",
         "answered",
         "rag"
@@ -101,6 +102,7 @@ def main():
                 "encoder": st.session_state.encoder,
                 "encoder_model": st.session_state.encoder_model,
                 "llm_model": st.session_state.llm_model,
+                "rag_id": st.session_state.rag.id,
                 "user_input": st.session_state.user_input,
                 "answer": answer,
                 "answer_language": st.session_state.language,
@@ -132,6 +134,13 @@ def main():
                     save_results(es_client, st.session_state.results, index_name=RESULTS_INDEX_NAME)
                     st.success("Feedback saved: -1")
                     print("Feedback saved: -1")
+        
+        # Display recent conversations
+        st.subheader("Recent Conversations")
+        recent_conversations = get_recent_docs(es_client, RESULTS_INDEX_NAME, st.session_state.conversation_id, size=5)
+        for conv in recent_conversations:
+            st.write(f"Q: {conv['user_input']}")
+            st.write(f"A: {conv['answer']}")
 
 if __name__ == "__main__":
     main()

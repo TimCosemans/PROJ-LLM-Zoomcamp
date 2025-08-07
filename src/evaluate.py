@@ -2,6 +2,7 @@ import json
 from ollama import Client
 import os
 import sys
+import numpy as np
 
 from src.rag import RAG
 sys.path.append('./')
@@ -14,20 +15,22 @@ GROUND_TRUTH_MODEL = "llama3.2"
 DATA_PATH = 'data/documents-llm.json'
 GROUND_TRUTH_DATA_PATH = 'data/ground_truth.csv'
 
-def _relevance(query, answer, ollama_client, llm_model=GROUND_TRUTH_MODEL):
+def relevance(query, answer, ollama_client, llm_model=GROUND_TRUTH_MODEL):
     prompt_template = """
-    You are an expert evaluator for a Retrieval-Augmented Generation (RAG) system.
-    Your task is to analyze the relevance of the generated answer to the given question.
+    You are an API that evaluates a Retrieval-Augmented Generation (RAG) system.
+    You analyze the relevance of the generated answer to the given question.
     Based on the relevance of the generated answer, you will classify it
     as "NON_RELEVANT", "PARTLY_RELEVANT", or "RELEVANT".
 
+    Your response is composed using strictly and exclusively the information provided in the given record. 
+    
     Here is the data for evaluation:
 
     Question: {query}
-    Generated Answer: {answer}
-
-    Please analyze the content and context of the generated answer in relation to the question
-    and provide your evaluation in parsable JSON without using code blocks:
+    Generated Answer: {answer}   
+    
+    Do not provide any additional commentary. 
+    Provide the output in parsable JSON without using code blocks on the following format:
 
     {{
       "Relevance": "NON_RELEVANT" | "PARTLY_RELEVANT" | "RELEVANT",
@@ -60,7 +63,9 @@ def save_results(es_client, results, index_name):
                 "conversation_id": {"type": "keyword"},
                 "encoder": {"type": "keyword"},
                 "encoder_model": {"type": "keyword"},
+                "n_context_docs": {"type": "integer"},
                 "llm_model": {"type": "keyword"},
+                "rag_id": {"type": "keyword"},
                 "user_input": {"type": "keyword"},
                 "answer": {"type": "keyword"},
                 "answer_language": {"type": "keyword"},
@@ -95,14 +100,17 @@ def generate_ground_truth_data(ollama_client, ground_truth_data_path=GROUND_TRUT
         
 def _generate_ground_truth(record, ollama_client, llm_model=GROUND_TRUTH_MODEL):
     prompt_template =  """
-        You emulate a user who asks questions to a chatbot.
-        Formulate 5 questions this user might ask based on a record. The record
-        should contain the answer to the questions, and the questions should be complete and not too short.
+        You emulate a computer program that automatically generates questions based on a record. 
+        Your task is to generate 5 questions based on the provided record.
+        These questions are composed using strictly and exclusively the information provided in the given record. 
+        
+        Your response should contain the answer to the questions, and the questions should be complete and not too short.
         If possible, use as few words as possible from the record. 
 
         The record: {record}
 
-        Provide the output in parsable JSON without using code blocks:
+        Do not explain your answer or provide any additional commentary. 
+        Provide the output in parsable JSON without using code blocks on the following format:
 
         {{
             "Questions": ["question1", "question2", ..., "question5"]
@@ -128,13 +136,21 @@ def _generate_ground_truth(record, ollama_client, llm_model=GROUND_TRUTH_MODEL):
     except json.JSONDecodeError:
         return "Failed to parse questions"
     
-def offline_evaluation(rag: RAG, ollama_client, es_client)
+def offline_evaluation(rag: RAG, ollama_client, es_client):
       
     metrics = _metrics_retrieval(rag)
     metrics['rag_id'] = rag.id
     metrics.update(_metrics_rag(rag, ollama_client, es_client))
     
-    mapping = define_simple_mapping([metrics])
+    mapping = {
+        "mappings": {
+            "properties": {
+                key: {"type": "float"} for key in metrics.keys() if key != 'rag_id'
+                }
+            }   
+        }
+    mapping["mappings"]["properties"]["rag_id"] = {"type": "keyword"}
+
     save_docs(es_client, "rag-evaluation", mapping, [metrics], delete_index=False)
 
 def _metrics_retrieval(rag, ground_truth_data_path=GROUND_TRUTH_DATA_PATH):
@@ -153,11 +169,13 @@ def _metrics_retrieval(rag, ground_truth_data_path=GROUND_TRUTH_DATA_PATH):
     docs = pd.read_csv(ground_truth_data_path)
     relevance_total = []
 
-    for doc in docs:
+    def _relevance(doc, relevance_total):
         context = rag.lookup_context(doc['question']) # will always be the question field
         doc_id = doc['id']
         relevance = [d['id'] == doc_id for d in context]
         relevance_total.append(relevance)
+
+    docs.apply(lambda x: _relevance(x, relevance_total), axis=1)
 
     return {
         'hit_rate': _hit_rate(relevance_total),
@@ -184,21 +202,22 @@ def _metrics_rag(rag, ollama_client, es_client, ground_truth_data_path=GROUND_TR
     relevance_scores = []
     cosine_similarities = []
 
-    for doc in docs: 
-        query = doc['questions']
+    def _metrics(doc, relevance_scores, cosine_similarities):
+        query = doc['question']
         answer = rag.predict(query)
-        relevance_score, _ = _relevance(query, answer, ollama_client)
+        relevance_score, _ = relevance(query, answer, ollama_client)
         relevance_scores.append(relevance_score)
 
         answer_encoded = rag.encode(answer) # numeric representation of the answer
         ground_truth_answer = es_client.search(index=rag.index_name, 
                                                query={"match": {"id": doc['id']}})
-        ground_truth_answer = ground_truth_answer['hits']['hits'][0]['_source'][rag.field_to_encode]
-        ground_truth_answer_encoded = rag.encode(ground_truth_answer)
-        cosine_similarity = answer_encoded @ ground_truth_answer_encoded.T
+        ground_truth_answer_encoded = ground_truth_answer['hits']['hits'][0]['_source'][f'{rag.field_to_encode}_encoded']
+        cosine_similarity = np.array(answer_encoded) @ np.array(ground_truth_answer_encoded).T
 
         cosine_similarities.append(cosine_similarity)
-    
+
+    docs.iloc.apply(lambda x: _metrics(x, relevance_scores, cosine_similarities), axis=1)
+        
     return {
         'count_non_relevant': relevance_scores.count("NON_RELEVANT"),
         'count_partly_relevant': relevance_scores.count("PARTLY_RELEVANT"),
