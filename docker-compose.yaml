@@ -176,6 +176,8 @@ services:
   container_name: streamlit
   ports:
     - "8501:8501"
+  networks:
+    - default_network
   depends_on:
     es01:
       condition: service_healthy

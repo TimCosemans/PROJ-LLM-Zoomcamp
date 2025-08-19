@@ -65,8 +65,8 @@ def main():
         script_dir = os.path.dirname(os.path.abspath(__file__))
         st.session_state.data_path = os.path.join(script_dir, 'data/documents-llm.json')
 
-        st.session_state.es_client = client(host="host.docker.internal:9200")
-        st.session_state.ollama = Client(host='host.docker.internal:11434')
+        st.session_state.es_client = client(host="https://host.docker.internal:9200")
+        st.session_state.ollama = Client(host='http://ollama:11434')
 
 
         print('Encoding...')
@@ -129,12 +129,12 @@ def main():
         if st.session_state.answered:
             st.write('Please provide feedback on the answer to save')
             # Feedback buttons
-            col1, col2, col3 = st.columns([1, 1, 8])
+            col1, col2, col3 = st.columns([2, 2, 6])
             with col1:
                 if st.button("+1"):
                     st.session_state.results["user_feedback"] = 1
                     save_results(st.session_state.es_client, st.session_state.results, index_name=RESULTS_INDEX_NAME)
-                    st.success("Feedback saved: +1")
+                    st.success("Saved!")
                     print("Feedback saved: +1")
 
                     st.session_state.feedback = True
@@ -143,7 +143,7 @@ def main():
                 if st.button("-1"):
                     st.session_state.results["user_feedback"] = -1
                     save_results(st.session_state.es_client, st.session_state.results, index_name=RESULTS_INDEX_NAME)
-                    st.success("Feedback saved: -1")
+                    st.success("Saved!")
                     print("Feedback saved: -1")
 
                     st.session_state.feedback = True

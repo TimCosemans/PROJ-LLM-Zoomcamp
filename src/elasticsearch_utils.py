@@ -15,7 +15,7 @@ def client(host):
     #https://discuss.elastic.co/t/issue-connecting-python-to-elasticsearch-in-docker-environment/361507/2
     es_client = Elasticsearch(
         hosts=[host],
-        basic_auth=('elastic', 'password'), #os.getenv("ELASTIC_PASSWORD")), CHANGE 
+        basic_auth=('elastic', 'password'), 
         verify_certs=False,
         max_retries=30,
         retry_on_timeout=True,
