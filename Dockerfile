@@ -8,4 +8,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src src
 COPY data data
 
+COPY app.py .
+
+EXPOSE 8501
+
 CMD ["streamlit", "run", "app.py"]

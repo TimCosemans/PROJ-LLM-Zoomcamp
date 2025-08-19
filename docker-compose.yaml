@@ -17,9 +17,11 @@ volumes:
     driver: local
 
 networks:
- default:
-   name: elastic
-   external: false
+ default_network:
+      driver: bridge
+#  default:
+#    name: elastic
+#    external: false
 
 services:
  setup:
@@ -76,6 +78,8 @@ services:
      interval: 1s
      timeout: 5s
      retries: 120
+   networks:
+      - default_network
 
  es01:
    depends_on:
@@ -120,6 +124,8 @@ services:
      interval: 10s
      timeout: 10s
      retries: 120
+   networks:
+      - default_network
 
  kibana:
    depends_on:
@@ -152,6 +158,8 @@ services:
      interval: 10s
      timeout: 10s
      retries: 120
+   networks:
+      - default_network
 
  ollama:
   image: ollama/ollama
@@ -160,3 +168,18 @@ services:
     - ollama:/root/.ollama
   ports:
     - "11434:11434"
+  networks:
+    - default_network
+
+ streamlit:
+  build: .
+  container_name: streamlit
+  ports:
+    - "8501:8501"
+  depends_on:
+    es01:
+      condition: service_healthy
+    kibana:
+      condition: service_healthy
+    ollama:
+        condition: service_started

@@ -14,19 +14,21 @@ from src.evaluate import relevance, save_results
 DOCS_INDEX_NAME = "llm-doc"
 RESULTS_INDEX_NAME = "app-results"
 
-es_client = client(host="https://localhost:9200")
-ollama = Client(host='http://localhost:11434')
-
+N_CONTEXT_DOCS = 10
+FIELD_TO_ENCODE = 'question'
 
 def main():
     st.title("Multilingual Course Assistant Tester")
 
-    st.session_state.conversation_id = str(uuid.uuid4())
+    if 'conversation_id' not in st.session_state:
+        # Initialize conversation ID if not already set
+        st.session_state.conversation_id = str(uuid.uuid4())
 
     variables_to_initialize = [
         "encoded",
         "answered",
-        "rag"
+        "rag", 
+        "feedback"
     ]
 
     # Session state initialization
@@ -63,21 +65,26 @@ def main():
         script_dir = os.path.dirname(os.path.abspath(__file__))
         st.session_state.data_path = os.path.join(script_dir, 'data/documents-llm.json')
 
+        st.session_state.es_client = client(host="host.docker.internal:9200")
+        st.session_state.ollama = Client(host='host.docker.internal:11434')
+
+
         print('Encoding...')
 
-        st.session_state.rag = RAG(
+        rag = RAG(
             data_path=st.session_state.data_path,
-            field_to_encode='question',
+            field_to_encode=FIELD_TO_ENCODE,
             index_name=DOCS_INDEX_NAME,
             encoder=st.session_state.encoder,
             encoder_model=st.session_state.encoder_model,
+            n_context_docs=N_CONTEXT_DOCS,
             llm_model=st.session_state.llm_model,
-            es_client=es_client,
-            ollama_client=ollama, 
+            es_client=st.session_state.es_client,
+            ollama_client=st.session_state.ollama, 
             answer_language=st.session_state.language
         )
 
-        # st.session_state.rag = rag.fit()
+        st.session_state.rag = rag.fit()
 
         st.session_state.encoded = True
 
@@ -95,14 +102,15 @@ def main():
             answer = st.session_state.rag.predict(st.session_state.user_input)
             end_time = time.time()
 
-            relevance_score, explanation = relevance(st.session_state.user_input, answer, ollama, st.session_state.llm_model)
+            relevance_score, explanation = relevance(st.session_state.user_input, answer, st.session_state.ollama, st.session_state.llm_model)
 
             st.session_state.results = {
+                "rag_id": st.session_state.rag.id,
                 "conversation_id": st.session_state.conversation_id,
                 "encoder": st.session_state.encoder,
                 "encoder_model": st.session_state.encoder_model,
+                "n_context_docs": N_CONTEXT_DOCS,
                 "llm_model": st.session_state.llm_model,
-                "rag_id": st.session_state.rag.id,
                 "user_input": st.session_state.user_input,
                 "answer": answer,
                 "answer_language": st.session_state.language,
@@ -119,28 +127,35 @@ def main():
             st.write(answer)
 
         if st.session_state.answered:
+            st.write('Please provide feedback on the answer to save')
             # Feedback buttons
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns([1, 1, 8])
             with col1:
                 if st.button("+1"):
                     st.session_state.results["user_feedback"] = 1
-                    save_results(es_client, st.session_state.results, index_name=RESULTS_INDEX_NAME)
+                    save_results(st.session_state.es_client, st.session_state.results, index_name=RESULTS_INDEX_NAME)
                     st.success("Feedback saved: +1")
                     print("Feedback saved: +1")
+
+                    st.session_state.feedback = True
 
             with col2:
                 if st.button("-1"):
                     st.session_state.results["user_feedback"] = -1
-                    save_results(es_client, st.session_state.results, index_name=RESULTS_INDEX_NAME)
+                    save_results(st.session_state.es_client, st.session_state.results, index_name=RESULTS_INDEX_NAME)
                     st.success("Feedback saved: -1")
                     print("Feedback saved: -1")
-        
-        # Display recent conversations
-        st.subheader("Recent Conversations")
-        recent_conversations = get_recent_docs(es_client, RESULTS_INDEX_NAME, st.session_state.conversation_id, size=5)
-        for conv in recent_conversations:
-            st.write(f"Q: {conv['user_input']}")
-            st.write(f"A: {conv['answer']}")
+
+                    st.session_state.feedback = True
+            
+            if st.session_state.feedback:
+                # Display recent conversations
+                st.subheader("Recent Conversations")
+                recent_conversations = get_recent_docs(st.session_state.es_client, RESULTS_INDEX_NAME, st.session_state.conversation_id, size=5)
+                for conv in recent_conversations:
+                    st.write(f"Q: {conv['user_input']}")
+                    st.write(f"A: {conv['answer']}")
+                    st.divider()
 
 if __name__ == "__main__":
     main()

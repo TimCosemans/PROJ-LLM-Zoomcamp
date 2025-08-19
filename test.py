@@ -17,7 +17,7 @@ RESULTS_INDEX_NAME = "app-results"
 es_client = client(host="https://localhost:9200")
 ollama = Client(host='http://localhost:11434')
 
-# generate_ground_truth_data(ollama)
+generate_ground_truth_data(ollama)
 
 conversation_id = str(uuid.uuid4())
 encoder = "ollama"
@@ -41,31 +41,31 @@ rag = RAG(
     es_client=es_client,
     ollama_client=ollama, 
     answer_language=language
-) #.fit()
+).fit()
 
-# user_input = "Can I still join the course?"
+user_input = "Can I still join the course?"
 
-# start_time = time.time()
-# answer = rag.predict(user_input)
-# end_time = time.time()
+start_time = time.time()
+answer = rag.predict(user_input)
+end_time = time.time()
 
-# relevance_score, explanation = relevance(user_input, answer, ollama, llm_model)
-# results = {
-#         "rag_id": rag.id,
-#         "conversation_id": conversation_id,
-#         "encoder": encoder,
-#         "encoder_model": encoder_model,
-#         "n_context_docs": n_context_docs,
-#         "llm_model": llm_model,
-#         "user_input": user_input,
-#         "answer": answer,
-#         "answer_language": language,
-#         "answer_time": int(end_time - start_time),  
-#         "relevance": relevance_score,
-#         "explanation": explanation
-#         }
+relevance_score, explanation = relevance(user_input, answer, ollama, llm_model)
+results = {
+        "rag_id": rag.id,
+        "conversation_id": conversation_id,
+        "encoder": encoder,
+        "encoder_model": encoder_model,
+        "n_context_docs": n_context_docs,
+        "llm_model": llm_model,
+        "user_input": user_input,
+        "answer": answer,
+        "answer_language": language,
+        "answer_time": int(end_time - start_time),  
+        "relevance": relevance_score,
+        "explanation": explanation
+        }
 
-# save_results(es_client, results, index_name=RESULTS_INDEX_NAME)
+save_results(es_client, results, index_name=RESULTS_INDEX_NAME)
 
 offline_evaluation(rag, ollama, es_client)
 

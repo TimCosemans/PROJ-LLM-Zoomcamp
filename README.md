@@ -13,3 +13,20 @@ To make use of the reciprocal rank fusion (RRF) algorithm for reranking answers 
 You can generate the ground truth data as well as perform the offline evaluation of any initiated rag using the functions in test.py. Beware, these will take a very long time to run on a local machine, so it is recommended to run them on a server with sufficient resources.
 
 The app only performs fitting of the rag, prediction and online evaluation. The offline evaluation is done in the test.py file.
+
+I implemented the following best practices:
+- Hybrid search
+- Document reranking using RRF
+
+I did not implement the following best practices:
+- Chunking (since the data is already in pretty small chunks)
+- User query rewriting (running the LLM locally, this will take up even more resources)
+
+
+Go to localhost:5601 and log in with username `elastic` and password `password` to access Kibana.
+
+
+To run the test script, you need to install the required packages using the requirements.txt file. You can do this by running the following command in your terminal:
+
+```bash
+pip install -r requirements.txt
