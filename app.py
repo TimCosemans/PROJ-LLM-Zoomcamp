@@ -41,18 +41,28 @@ def main():
     if st.session_state.encoder == "ollama":
         st.session_state.encoder_model = st.selectbox(
             "Select a model:",
-            ["llama3.2", "mistral-small3.2"],
+            ["llama3.2:1b", 
+             "moondream:1.8b", 
+             "orca-mini:3b", 
+             "phi4-mini:3.8b", 
+             "smallthinker:3b"],
         )
     else:   
         # For Hugging Face, we can use a fixed model or allow user selection
         st.session_state.encoder_model = st.selectbox(
             "Select a model:",
-            ["intfloat/multilingual-e5-small", "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"],
+            ["intfloat/multilingual-e5-small", 
+             "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+             "Qwen/Qwen3-Embedding-0.6B"],
         )
     
     st.session_state.llm_model = st.selectbox(
         "Select a language model:",
-        ["llama3.2", "mistral-small3.2"],
+        ["llama3.2:1b", 
+         "moondream:1.8b",
+         "orca-mini:3b", 
+         "phi4-mini:3.8b", 
+         "smallthinker:3b"],
     )
 
     st.session_state.language = st.selectbox(
@@ -67,7 +77,6 @@ def main():
 
         st.session_state.es_client = client(host="https://host.docker.internal:9200")
         st.session_state.ollama = Client(host='http://ollama:11434')
-
 
         print('Encoding...')
 
